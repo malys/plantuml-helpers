@@ -28,7 +28,7 @@ jobs:
           script: |
               const response = await github.rest.repos.createRelease({
                 draft: false,
-                generate_release_notes: fase,
+                generate_release_notes: false,
                 name: 'Weekly Release',
                 owner: context.repo.owner,
                 prerelease: false,
