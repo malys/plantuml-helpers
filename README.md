@@ -10,12 +10,14 @@ It's not perfect but it's  a real help.
 * Install [vscode-complete-from-file](https://github.com/rioj7/vscode-complete-from-file)
 * Download release package
 
-```cmd
-URL=$(curl -s https://api.github.com/repos/japdl/japdl/releases/latest | grep "browser_download_url.*win\.zip" | cut -d : -f 2,3 | tr -d \" )
-ZIP=japdl.zip
+
+```sh
+ZIP=vscode-helpers.zip
+URL=$(curl -s https://api.github.com/repos/malys/plantuml-helpers/releases/latest | grep "browser_download_url" | cut -d : -f 2,3 | tr -d \" )
 echo Downloading $URL
 curl -qLk $URL -o $ZIP
-"/c/Program Files/Bandizip/bc.exe"  x -target:auto -o:./ -y $ZIP
+"/c/Program Files/Bandizip/bc.exe"  x -target:auto -o:./release -y $ZIP
+rm $ZIP
 
 ```
 * Configure `vscode-complete-from-file` entension to load files from *plantuml-helpers*
