@@ -8,8 +8,7 @@ It's not perfect but it's  a real help.
 ## Installation
 
 * Install [vscode-complete-from-file](https://github.com/rioj7/vscode-complete-from-file)
-* Download release package
-
+* Download latest release
 
 ```sh
 ZIP=vscode-helpers.zip
