@@ -26,5 +26,5 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: vscode-helpers.zip
-          asset_name: vscode-helpers
-          tag: latest
+          asset_name: vscode-helpers.zip
+          tag: weekly
