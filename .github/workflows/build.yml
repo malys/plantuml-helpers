@@ -21,17 +21,10 @@ jobs:
         with:
           files: release/
           dest: vscode-helpers.zip
-      - name: "Create release"
-        uses: "actions/github-script@v6"
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          script: |
-              const response = await github.rest.repos.createRelease({
-                draft: false,
-                generate_release_notes: false,
-                name: 'Weekly Release',
-                owner: context.repo.owner,
-                prerelease: false,
-                repo: context.repo.repo,
-                tag_name: "latest",
-              });
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: vscode-helpers.zip
+          asset_name: vscode-helpers
+          tag: latest
