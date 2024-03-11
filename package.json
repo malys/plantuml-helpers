@@ -1,0 +1,30 @@
+{
+  "name": "plantuml-helpers",
+  "version": "1.0.0",
+  "description": "Tooling to generate autocompletion for VSCode \"complete from files\" and snippets from public plantuml documentation",
+  "main": "index.js",
+  "scripts": {
+    "build":"npx zx index.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/malys/plantuml-helpers.git"
+  },
+  "keywords": [
+    "plantuml",
+    "stdlib",
+    "autocompletion",
+    "snippets"
+  ],
+  "author": "malys",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/malys/plantuml-helpers/issues"
+  },
+  "homepage": "https://github.com/malys/plantuml-helpers#readme",
+  "dependencies": {
+    "pdf-parse-fork": "^1.2.0",
+    "zx": "^7.2.3"
+  }
+}

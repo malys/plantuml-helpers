@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      - run: npm install
+      - run: npm run build
+      - uses: vimtor/action-zip@v1.2
+        with:
+          files: release/
+          dest: vscode-helpers.zip
+      - name: "Create release"
+        uses: "actions/github-script@v6"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          script: |
+            try {
+              const response = await github.rest.repos.createRelease({
+                draft: false,
+                generate_release_notes: fase,
+                name: 'Weekly Release',
+                owner: context.repo.owner,
+                prerelease: false,
+                repo: context.repo.repo,
+                tag_name: "latest",
+              });
