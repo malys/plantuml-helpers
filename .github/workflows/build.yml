@@ -26,7 +26,6 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           script: |
-            try {
               const response = await github.rest.repos.createRelease({
                 draft: false,
                 generate_release_notes: fase,
