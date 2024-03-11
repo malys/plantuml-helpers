@@ -27,4 +27,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: vscode-helpers.zip
           asset_name: vscode-helpers.zip
+          body: "autocompletion for VSCode \"complete from files\" and snippets."
           tag: weekly
+          overwrite: true
