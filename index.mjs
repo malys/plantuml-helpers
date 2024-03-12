@@ -52,11 +52,12 @@ async function stdlibGenerator() {
     await $.noquote`git clone --depth 1 https://github.com/plantuml/plantuml-stdlib`
 
     //readme parsing for snippets
-    const REGEX = /((#{0,3}\s)(?<title>([a-zA-Z- ,]+)\s))(?<between>[\s\S]*?)(?<example>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g
+    const REGEX = /((#{0,3}\s)(?<title>([a-zA-Z- ,]+)\s))(?<between>[\s\S]*?)(?<body>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g
     Object.assign(snippets, regexpProcess(REGEX, fs.readFileSync('plantuml-stdlib/README.md', 'utf8').replace(/#{0,3}\s\[[a-z]*\]/gm, '')))
 
     //tree parsing for autocompletion
-    const REGEX_DEFINE = /(define|procedure)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
+    const REGEX_DEFINE = /^\!(define|procedure)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
+    const REGEX_CODE = /^\!(define|procedure)\s?([a-z]+)?\s?(?<body>(?<prefix>[^_\$][^(\$\W]{3,})\((?<params>([^\)]+))\))/gm;
     const REGEX_THEME = /(theme)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
 
     const folders = await glob('plantuml-stdlib/*', { onlyDirectories: true })
@@ -68,8 +69,11 @@ async function stdlibGenerator() {
         let theme = []
         puml.forEach(f => {
             let content = fs.readFileSync(f, 'utf8')
-            define.push([...content.matchAll(REGEX_DEFINE)].map(match => match[3].trim()))
+            //console.log(`Start to processing ${f}`)
+            Object.assign(snippets, regexpProcess(REGEX_CODE, content, fromCode))
+            //  define.push([...content.matchAll(REGEX_DEFINE)].map(match => match[3].trim()))
             theme.push([...content.matchAll(REGEX_THEME)].map(match => match[3].trim()))
+            //console.log(`Finish to processing ${f}`)
         })
 
         //"plantuml-stdlib/logos/gaugeio.puml"
@@ -153,7 +157,7 @@ async function pdfGenerator() {
     const buffer = await response.buffer();
     let data = await pdf(buffer);
     let text = data.text.split('\n').filter(f => !f.startsWith("PlantUML Language Reference Guide")).join('\n')
-    Object.assign(snippets, regexpProcess(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,]+)\s))(?<between>[\s\S]*?)(?<example>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g, text));
+    Object.assign(snippets, regexpProcess(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,]+)\s))(?<between>[\s\S]*?)(?<body>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g, text));
     cd('../..')
 }
 
@@ -163,7 +167,7 @@ async function pdfGenerator() {
  * @param {object} data - the data to be processed
  * @return {object} 
  */
-function regexpProcess(REGEXP_EXAMPLE, data) {
+function regexpProcess(REGEXP_EXAMPLE, data, processor = fromExamples) {
     let m
     let snippets = {}
     while ((m = REGEXP_EXAMPLE.exec(data)) !== null) {
@@ -172,18 +176,49 @@ function regexpProcess(REGEXP_EXAMPLE, data) {
             regex.lastIndex++;
         }
 
-        let puml = m.groups
-        let title = puml.title.trim().toLowerCase().replace(/\W/g, "_")
-        let prefix = `${puml.type}-${title}`.replace('__', '_')
+        let data = processor(m.groups)
 
-        snippets[title] = {
-            "prefix": [`p${prefix}`],
-            "body": puml.example.split(os.EOL).map(m => m.replace(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,0-9]+)\s))/g, '').trim()),
-            "description": title
+        snippets[data.title] = {
+            "scope": "plantuml",
+            "prefix": [data.prefix],
+            "body": data.body,
+            "description": data.description
         }
 
     }
     return snippets
+}
+
+/**
+ * A function to generate a new object based on the input puml.
+ *
+ * @param {type} puml - the input puml
+ * @return {type} the generated object
+ */
+function fromExamples(puml) {
+    let title = puml.title.trim().toLowerCase().replace(/\W/g, "_")
+    return {
+        "title": title,
+        "prefix": `p${puml.type}►${title}`.replace('__', '_'),
+        "body": puml.body.split(os.EOL).map(m => m.replace(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,0-9]+)\s))/g, '').trim()),
+        "description": title
+    }
+}
+
+/**
+ * A function that takes a puml object and returns an object with title, prefix, body, and description properties.
+ *
+ * @param {type} puml - description of parameter
+ * @return {object} An object with title, prefix, body, and description properties
+ */
+function fromCode(puml) {
+    let title = puml.prefix
+    return {
+        "title": title,
+        "prefix": puml.prefix,
+        "body": puml.prefix + '(' + puml.params.split(',').map((m, i) => `\$\{${i}:${m.trim()}\}`).join(',') + ')',
+        "description": puml.body
+    }
 }
 
 await stdlibGenerator()
