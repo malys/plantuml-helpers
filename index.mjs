@@ -13,18 +13,20 @@ $.noquote = async (...args) => {
     $.quote = q;
     return p
 }
-
+const SEP = '>'
 const BASE_FOLDER = path.resolve(__dirname)
 const RELEASE_FOLDER = path.resolve(path.join(BASE_FOLDER, 'release'))
 const OUTPUT_FOLDER = path.resolve(path.join(RELEASE_FOLDER, 'plantuml-helpers'))
+const FASTKEYS_FOLDER = path.resolve(path.join(RELEASE_FOLDER, 'fastkeys'))
 
-try {
-    if (fs.existsSync(OUTPUT_FOLDER)) {
-        fs.rmdirSync(OUTPUT_FOLDER, { recursive: true, force: true })
-    }
-    fs.mkdirSync(OUTPUT_FOLDER, { recursive: true, force: true });
-} catch (err) { }
-
+for (const FOLDER of [OUTPUT_FOLDER, FASTKEYS_FOLDER]) {
+    try {
+        if (fs.existsSync(FOLDER)) {
+            fs.rmSync(FOLDER, { recursive: true, force: true })
+        }
+        fs.mkdirSync(FOLDER, { recursive: true, force: true });
+    } catch (err) { }
+}
 
 let snippets = {}
 
@@ -56,7 +58,7 @@ async function stdlibGenerator() {
     Object.assign(snippets, regexpProcess(REGEX, fs.readFileSync('plantuml-stdlib/README.md', 'utf8').replace(/#{0,3}\s\[[a-z]*\]/gm, '')))
 
     //tree parsing for autocompletion
-    const REGEX_DEFINE = /^\!(define|procedure)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
+    //const REGEX_DEFINE = /^\!(define|procedure)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
     const REGEX_CODE = /^\!(define|procedure)\s?([a-z]+)?\s?(?<body>(?<prefix>[^_\$][^(\$\W]{3,})\((?<params>([^\)]+))\))/gm;
     const REGEX_THEME = /(theme)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
 
@@ -90,6 +92,9 @@ async function stdlibGenerator() {
 
         // Export autocompletion files
         fs.writeFileSync(path.join(`plantuml-${folder.split('/')[1]}.complete`), result.map(m => m.trim()).join("\n"))
+
+        //Export Fastkeys in append mode
+        fs.writeFileSync(path.join(FASTKEYS_FOLDER, "plantuml.txt"), result.map(m => m.trim()).join("\n"), { flag: 'a' })
 
     }
     await $.noquote`rm -rf plantuml-stdlib || true `
@@ -154,7 +159,7 @@ async function pdfGenerator() {
     cd(OUTPUT_FOLDER)
     const FILE = 'PlantUML_Language_Reference_Guide_en.pdf'
     const response = await fetch(`https://pdf.plantuml.net/${FILE}`);
-    const buffer = await response.buffer();
+    const buffer = await response.arrayBuffer();
     let data = await pdf(buffer);
     let text = data.text.split('\n').filter(f => !f.startsWith("PlantUML Language Reference Guide")).join('\n')
     Object.assign(snippets, regexpProcess(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,]+)\s))(?<between>[\s\S]*?)(?<body>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g, text));
@@ -199,8 +204,8 @@ function fromExamples(puml) {
     let title = puml.title.trim().toLowerCase().replace(/\W/g, "_")
     return {
         "title": title,
-        "prefix": `p${puml.type}►${title}`.replace('__', '_'),
-        "body": puml.body.split(os.EOL).map(m => m.replace(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,0-9]+)\s))/g, '').trim()),
+        "prefix": `p${puml.type}${SEP}${title}`.replace('__', '_'),
+        "body": puml.body.split('\n').map(m => m.replace(/((([0-9]*\.?)+\s{2})(?<title>([a-zA-Z- ,0-9]+)\s))/g, '').trim()),
         "description": title
     }
 }
@@ -225,4 +230,21 @@ await stdlibGenerator()
 await themesGenerator()
 await pdfGenerator()
 
-fs.writeFileSync(path.join(OUTPUT_FOLDER, '..', `plantuml.code-snippets`), JSON.stringify(snippets))
+
+//VSCode snippets
+fs.writeFileSync(path.join(OUTPUT_FOLDER, '..', `plantuml.code-snippets`), JSON.stringify(snippets, null, 2))
+// FastKeys autocomplete
+fs.writeFileSync(path.join(FASTKEYS_FOLDER, `plantuml.txt`),
+    Object.keys(snippets)
+        .filter(k => snippets[k].prefix[0].indexOf(SEP) === -1)
+        .map(k => {
+        //   if (snippets[k].prefix[0].indexOf(SEP) > -1) {
+        //      return snippets[k].body.join('\`n')
+        //  } else {
+        return snippets[k].description
+        //   }
+
+    }).join('\n')
+    , { flag: 'a' })
+
+
