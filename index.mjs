@@ -54,7 +54,7 @@ async function stdlibGenerator() {
     await $.noquote`git clone --depth 1 https://github.com/plantuml/plantuml-stdlib`
 
     //readme parsing for snippets
-    const REGEX = /((#{0,3}\s)(?<title>([a-zA-Z- ,]+)\s))(?<between>[\s\S]*?)(?<body>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g
+    const REGEX = /((#{0,3}\s)(?<title>([a-zA-Z- ,]+)\s))(?<between>[^#]*?)(?<body>(@start(?<type>[a-z]+))[\s\S]*?(@end[a-z]+))/g
     Object.assign(snippets, regexpProcess(REGEX, fs.readFileSync('plantuml-stdlib/README.md', 'utf8').replace(/#{0,3}\s\[[a-z]*\]/gm, '')))
 
     //tree parsing for autocompletion
@@ -238,13 +238,13 @@ fs.writeFileSync(path.join(FASTKEYS_FOLDER, `plantuml.txt`),
     Object.keys(snippets)
         .filter(k => snippets[k].prefix[0].indexOf(SEP) === -1)
         .map(k => {
-        //   if (snippets[k].prefix[0].indexOf(SEP) > -1) {
-        //      return snippets[k].body.join('\`n')
-        //  } else {
-        return snippets[k].description
-        //   }
+            //   if (snippets[k].prefix[0].indexOf(SEP) > -1) {
+            //      return snippets[k].body.join('\`n')
+            //  } else {
+            return snippets[k].description
+            //   }
 
-    }).join('\n')
+        }).join('\n')
     , { flag: 'a' })
 
 
