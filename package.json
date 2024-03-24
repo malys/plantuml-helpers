@@ -4,7 +4,7 @@
   "description": "Tooling to generate autocompletion for VSCode \"complete from files\" and snippets from public plantuml documentation",
   "main": "index.js",
   "scripts": {
-    "build":"npx zx index.mjs",
+    "build": "npx zx index.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/malys/plantuml-helpers#readme",
   "dependencies": {
+    "cli-color": "^2.0.4",
     "pdf-parse-fork": "^1.2.0",
     "zx": "^7.2.3"
   }
