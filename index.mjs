@@ -83,7 +83,7 @@ async function stdlibGenerator() {
         for (const f of puml) {
             let content = fs.readFileSync(f, 'utf8')
             //console.log(`Start to processing ${f}`)
-            let result = regexpProcess(REGEX_CODE, content, fromCode)
+            let result = regexpProcess(REGEX_CODE, content, fromCode, '', '', false)
             Object.assign(snippets, result)
             theme.push([...content.matchAll(REGEX_THEME)].map(match => match[3].trim()))
             //console.log(`Finish to processing ${f}`)
@@ -287,7 +287,7 @@ await pdfGenerator()
 let snip3 = Object.keys(snippets).length
 console.log(LOG_CONCLUSION(`Snippets generated: ${snip3 - snip2}`));
 console.log(LOG_CONCLUSION(`Total Snippets generated: ${snip3}`));
-if (snip3 < 43000) {
+if (snip3 < 11000) {
     console.log(clc.magenta('Something went wrong. Not enough snippets generated.'))
     process.exit(1)
 }
