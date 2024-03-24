@@ -69,7 +69,7 @@ async function stdlibGenerator() {
 
     //tree parsing for autocompletion
     //const REGEX_DEFINE = /^\!(define|procedure)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
-    const REGEX_CODE = /^\!(define|procedure)\s?([a-z]+)?\s?(?<body>(?<prefix>[^_\$][^(\$\W]{3,})\((?<params>([^\)]+))\))/gm;
+    const REGEX_CODE = /^\!(?:define|procedure)\s?(?:[a-z]+)?\s?(?<body>(?<prefix>[^_\$][^(\$\W]{3,})\((?<params>(?:[^\)]+))\))/gm;
     const REGEX_THEME = /(theme)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
 
     const folders = await glob('plantuml-stdlib/*', { onlyDirectories: true })
@@ -79,14 +79,15 @@ async function stdlibGenerator() {
         let result = []
         let define = []
         let theme = []
-        puml.forEach(f => {
+
+        for (const f of puml) {
             let content = fs.readFileSync(f, 'utf8')
             //console.log(`Start to processing ${f}`)
-            Object.assign(snippets, regexpProcess(REGEX_CODE, content, fromCode))
-            //  define.push([...content.matchAll(REGEX_DEFINE)].map(match => match[3].trim()))
+            let result = regexpProcess(REGEX_CODE, content, fromCode)
+            Object.assign(snippets, result)
             theme.push([...content.matchAll(REGEX_THEME)].map(match => match[3].trim()))
             //console.log(`Finish to processing ${f}`)
-        })
+        }
 
         //"plantuml-stdlib/logos/gaugeio.puml"
         //Components
@@ -149,7 +150,7 @@ async function snippetsGenerator() {
     }
     */
     let puml = await glob([`PlayingWithPlantUMLSource/docs/**/*.puml`])
-    puml.forEach(f => {
+    for (const f of puml) {
         let content = fs.readFileSync(f, 'utf8')
         let name = path.parse(f).name.toLowerCase().split('sample')[0]
         let parent = path.basename(path.dirname(f))
@@ -159,7 +160,7 @@ async function snippetsGenerator() {
             "body": content.split(os.EOL).map(m => m.trim()),
             "description": cleanName(`${parent} ${name}`)
         }
-    })
+    }
 
     await $.noquote`rm -rf PlayingWithPlantUMLSource || true`
     cd(BASE_FOLDER)
@@ -183,11 +184,10 @@ async function pdfGenerator() {
         .replace(/PlantUML Language Reference Guide[^\n]+/gm, "")
         .replace(/\n\d\s{2}/gm, "\nÅ") // chapter
         .replace(/\n(\d+\.?)+\s{2}/gm, "\nÃ") // section
-
-    text.split('\nÅ').forEach(chapter => {
+    for (const chapter of text.split('\nÅ')) {
         const sections = chapter.trim().split('\nÃ').slice(1)
         const chapterTitle = chapter.trim().split('\n')[0].trim()
-        sections.forEach((section, i) => {
+        for (const section of sections) {
             const sectionTitle = section.trim().split('\n')[0].trim()
             let result = regexpProcess(
                 /(?:Ã(?:(?:[a-zA-Z- ,]+)\s))?(?:[\s\S]*?)(?<body>(?:@start(?<type>[a-z]+))[\s\S]*?(?:@end[a-z]+))/g,
@@ -196,10 +196,9 @@ async function pdfGenerator() {
                 sectionTitle,
                 chapterTitle
             )
-
             Object.assign(snippets, result);
-        })
-    })
+        }
+    }
     cd('../..')
 }
 
@@ -209,21 +208,20 @@ async function pdfGenerator() {
  * @param {object} data - the data to be processed
  * @return {object} 
  */
-function regexpProcess(REGEXP_EXAMPLE, data, processor = fromExamples, title = '', global_prefix = '', increment = true) {
+function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title = '', global_prefix = '', increment = true) {
     let m
     let snippets = {}
     let index = 0
-    while ((m = REGEXP_EXAMPLE.exec(data)) !== null) {
-        // This is necessary to avoid infinite loops with zero-width matches
+    while ((m = REGEXP_EXAMPLE.exec(content)) !== null) {
         if (m.index === REGEXP_EXAMPLE.lastIndex) {
             REGEXP_EXAMPLE.lastIndex++;
         }
         let puml = m.groups
         if (!puml.title) puml.title = title
-        puml.prefix = global_prefix.length > 0 ? global_prefix.trim().toLowerCase().replace(/\W/g, "_") + SEP : ''
+        if (!puml.prefix) puml.prefix = global_prefix.length > 0 ? global_prefix.trim().toLowerCase().replace(/\W/g, "_") + SEP : ''
 
         let data = processor(puml)
-        if (data.body && data.title) {
+        if (data.body) {
             index++
             if (index > 0 && increment) {
                 data.prefix = data.prefix + SEP + index
@@ -239,6 +237,7 @@ function regexpProcess(REGEXP_EXAMPLE, data, processor = fromExamples, title = '
         }
     }
     if (Object.keys(snippets).length > 0) console.log(LOG_SNIPPETS(`Snippets generated: ${Object.keys(snippets).length}`));
+
     return snippets
 }
 
@@ -273,15 +272,22 @@ function fromCode(puml) {
         "description": puml.body
     }
 }
-console.log(LOG_CONCLUSION(`================== STDLIB ==================`));
+console.log(LOG_CONCLUSION(`==================================== STDLIB ====================================`));
 await stdlibGenerator()
-console.log(LOG_CONCLUSION(`================== THEME ==================`));
+let snip1 = Object.keys(snippets).length
+console.log(LOG_CONCLUSION(`Snippets generated: ${snip1}`));
+
+console.log(LOG_CONCLUSION(`==================================== THEME ====================================`));
 await themesGenerator()
-console.log(LOG_CONCLUSION(`================== GUIDE ==================`));
+let snip2 = Object.keys(snippets).length
+console.log(LOG_CONCLUSION(`Snippets generated: ${snip2 - snip1}`));
+
+console.log(LOG_CONCLUSION(`==================================== GUIDE ====================================`));
 await pdfGenerator()
-const TOTAL = Object.keys(snippets).length
-console.log(LOG_CONCLUSION(`Total Snippets generated: ${TOTAL}`));
-if (TOTAL < 800) {
+let snip3 = Object.keys(snippets).length
+console.log(LOG_CONCLUSION(`Snippets generated: ${snip3 - snip2}`));
+console.log(LOG_CONCLUSION(`Total Snippets generated: ${snip3}`));
+if (snip3 < 43000) {
     console.log(clc.magenta('Something went wrong. Not enough snippets generated.'))
     process.exit(1)
 }
