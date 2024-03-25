@@ -8,17 +8,15 @@ It's not perfect but it's  a real help.
 ## Installation
 
 * Install [vscode-complete-from-file](https://github.com/rioj7/vscode-complete-from-file)
-* Download latest release
+* Download latest release, see example script: **update.sh**
 
-```sh
-ZIP=vscode-helpers.zip
-URL=$(curl -s https://api.github.com/repos/malys/plantuml-helpers/releases/latest | grep "browser_download_url" | cut -d : -f 2,3 | tr -d \" )
-echo Downloading $URL
-curl -qLk $URL -o $ZIP
-"/c/Program Files/Bandizip/bc.exe"  x -target:auto -o:./release -y $ZIP
-rm $ZIP
+<details>
+  <summary>In Action</summary>
 
-```
+![](./readme_deploy.gif)
+
+</details>
+
 * Configure `vscode-complete-from-file` entension to load files from *plantuml-helpers*
 ```json
 "complete-from-file.documents": {
@@ -57,3 +55,10 @@ ex: puml,pgantt
 ### Autocompletion
 
 Type **include + CTRL+SPACE**
+
+<details>
+  <summary>In Action</summary>
+
+![](./readme_usage.gif)
+
+</details>
