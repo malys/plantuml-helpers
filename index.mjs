@@ -203,10 +203,15 @@ async function pdfGenerator() {
 }
 
 /**
- * Processes the data using a regular expression to extract and format specific information.
+ * Processes a regular expression pattern on the given content and generates snippets based on the matches.
  *
- * @param {object} data - the data to be processed
- * @return {object} 
+ * @param {RegExp} REGEXP_EXAMPLE - The regular expression pattern to match against the content.
+ * @param {string} content - The content to be processed.
+ * @param {function} processor - The function to process the matched groups. Default is `fromExamples`.
+ * @param {string} title - The title to be assigned to the generated snippets. Default is an empty string.
+ * @param {string} global_prefix - The global prefix to be added to the generated snippet prefixes. Default is an empty string.
+ * @param {boolean} increment - Whether to increment the snippet prefixes if there are duplicates. Default is `true`.
+ * @return {Object} - An object containing the generated snippets, where the keys are the snippet titles and the values are objects with the properties "scope", "prefix", "body", and "description".
  */
 function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title = '', global_prefix = '', increment = true) {
     let m
