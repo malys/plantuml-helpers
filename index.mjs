@@ -223,14 +223,15 @@ function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title 
         }
         let puml = m.groups
         if (!puml.title) puml.title = title
-        if (!puml.prefix) puml.prefix = global_prefix.length > 0 ? global_prefix.trim().toLowerCase().replace(/\W/g, "_") + SEP : ''
+        if (!puml.prefix) puml.prefix = global_prefix.length > 0 ? clean(global_prefix) + SEP : ''
+        puml.title = clean(puml.title)
 
         let data = processor(puml)
         if (data.body) {
             index++
             if (index > 0 && increment) {
-                data.prefix = data.prefix + SEP + index
-                data.title = data.title + SEP + index
+                data.prefix = data.prefix + index
+                data.title = data.title + index
             }
             snippets[data.title] = {
                 "scope": "plantuml",
@@ -246,6 +247,32 @@ function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title 
     return snippets
 }
 
+
+/**
+ * Cleans the data by trimming, converting to lowercase, replacing non-word characters with underscore, 
+ * removing consecutive underscores, and removing trailing underscores.
+ *
+ * @param {string} data - the data to be cleaned
+ * @return {string} the cleaned data
+ */
+function clean(data) {
+    return data.trim().toLowerCase().replace(/\W/g, "_").replace(/__/g, '_').replace(/_$/g, '').replace(/^_/g, '')
+}
+
+/**
+ * Truncates the data by splitting it at '_', removing duplicates, and filtering out specific elements.
+ *
+ * @param {string} data - the data to be truncated
+ * @return {string} the truncated data
+ */
+function truncate(data) {
+    let result = [...new Set(data.split('_'))].filter(f => !['diagram', 'legacy', 'new'].includes(f))
+    if (data.length > 30) {
+        result= result.slice(0, 2)
+    }
+    return result.join('_')
+}
+
 /**
  * A function to generate a new object based on the input puml.
  *
@@ -253,10 +280,10 @@ function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title 
  * @return {type} the generated object
  */
 function fromExamples(puml) {
-    let title = puml.prefix + puml.title.trim().toLowerCase().replace(/\W/g, "_").replace(/__/g, '_')
+    let title = puml.prefix + puml.title
     return {
-        "title": title.trim(),
-        "prefix": `p${puml.type}${SEP}${title}`.replace(/__/g, '_'),
+        "title": title,
+        "prefix": `p${puml.type}${SEP}${truncate(title)}`,
         "body": puml.body.split('\n'),
         "description": title.replace(/[_>]/g, ' ')
     }
