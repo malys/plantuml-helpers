@@ -223,7 +223,7 @@ function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title 
         }
         let puml = m.groups
         if (!puml.title) puml.title = title
-        if (!puml.prefix) puml.prefix = global_prefix.length > 0 ? clean(global_prefix) + SEP : ''
+        if (!puml.prefix) puml.prefix = global_prefix.length > 0 ? clean(global_prefix) : ''
         puml.title = clean(puml.title)
 
         let data = processor(puml)
@@ -266,9 +266,9 @@ function clean(data) {
  * @return {string} the truncated data
  */
 function truncate(data) {
-    let result = [...new Set(data.split('_'))].filter(f => !['diagram', 'legacy', 'new'].includes(f))
-    if (data.length > 30) {
-        result= result.slice(0, 2)
+    let result = [...new Set(data.split('_'))].filter(f => !['diagram', 'legacy', 'new', 'and', 'or'].includes(f))
+    if (data.length > 20) {
+        result = result.slice(0, 2)
     }
     return result.join('_')
 }
@@ -280,10 +280,11 @@ function truncate(data) {
  * @return {type} the generated object
  */
 function fromExamples(puml) {
-    let title = puml.prefix + puml.title
+    let title = puml.prefix.trim().length > 2 ? puml.prefix + SEP + puml.title: puml.title
+    let prefix = puml.prefix.trim().length > 2 ? truncate(puml.prefix) + SEP + truncate(puml.title) : truncate(puml.title)
     return {
         "title": title,
-        "prefix": `p${puml.type}${SEP}${truncate(title)}`,
+        "prefix": `p${puml.type}${SEP}${prefix}`,
         "body": puml.body.split('\n'),
         "description": title.replace(/[_>]/g, ' ')
     }
@@ -319,10 +320,7 @@ await pdfGenerator()
 let snip3 = Object.keys(snippets).length
 console.log(LOG_CONCLUSION(`Snippets generated: ${snip3 - snip2}`));
 console.log(LOG_CONCLUSION(`Total Snippets generated: ${snip3}`));
-if (snip3 < 11000) {
-    console.log(clc.magenta('Something went wrong. Not enough snippets generated.'))
-    process.exit(1)
-}
+
 //VSCode snippets
 fs.writeFileSync(path.join(OUTPUT_FOLDER, '..', `plantuml.code-snippets`), JSON.stringify(snippets, null, 2))
 // FastKeys autocomplete
@@ -338,3 +336,8 @@ fs.writeFileSync(path.join(FASTKEYS_FOLDER, `plantuml.txt`),
 
         }).join('\n')
     , { flag: 'a' })
+
+if (snip3 < 11000) {
+    console.log(clc.magenta('Something went wrong. Not enough snippets generated.'))
+    process.exit(1)
+}
