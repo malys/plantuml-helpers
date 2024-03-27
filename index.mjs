@@ -222,14 +222,18 @@ function regexpProcess(REGEXP_EXAMPLE, content, processor = fromExamples, title 
             REGEXP_EXAMPLE.lastIndex++;
         }
         let puml = m.groups
+        //Reformat puml attributes
         if (!puml.title) puml.title = title
         if (!puml.prefix) puml.prefix = global_prefix.length > 0 ? clean(global_prefix) : ''
         puml.title = clean(puml.title)
+        if (puml.type) puml.type = puml.type.substring(0, 3)
 
+        //Generate snippets template
         let data = processor(puml)
         if (data.body) {
             index++
             if (index > 0 && increment) {
+                //Increment index for same entry key
                 data.prefix = data.prefix + index
                 data.title = data.title + index
             }
@@ -266,11 +270,24 @@ function clean(data) {
  * @return {string} the truncated data
  */
 function truncate(data) {
-    let result = [...new Set(data.split('_'))].filter(f => !['diagram', 'legacy', 'new', 'and', 'or'].includes(f))
+    const REPLACEMENT = {
+        'use_case': "uc",
+        'machine_learning': "ml"
+    }
+    //Remove duplicate, replace useless elements
+    let result = [...new Set(data.split('_'))].filter(f => f.length > 0 && !['diagram', 'legacy', 'new', 'library'].includes(f.toLowerCase()))
+    //Too long
     if (data.length > 20) {
         result = result.slice(0, 2)
     }
-    return result.join('_')
+    // Replace groups
+    result = result.join('_')
+    Object.keys(REPLACEMENT).forEach(m => {
+        if (result.indexOf(m) > -1) {
+            result = result.replace(m, REPLACEMENT[m])
+        }
+    })
+    return result
 }
 
 /**
@@ -280,7 +297,7 @@ function truncate(data) {
  * @return {type} the generated object
  */
 function fromExamples(puml) {
-    let title = puml.prefix.trim().length > 2 ? puml.prefix + SEP + puml.title: puml.title
+    let title = puml.prefix.trim().length > 2 ? puml.prefix + SEP + puml.title : puml.title
     let prefix = puml.prefix.trim().length > 2 ? truncate(puml.prefix) + SEP + truncate(puml.title) : truncate(puml.title)
     return {
         "title": title,

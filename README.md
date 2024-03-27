@@ -50,7 +50,7 @@ It's not perfect but it's  a real help.
 
 Type **p{{mode}}** where @start{{mode}}...@end{{mode}}
 
-ex: puml,pgantt
+ex: puml,pgan(tt),pmin(dmap)
 
 ### Autocompletion
 
