@@ -13,7 +13,7 @@ It's not perfect but it's  a real help.
 <details>
   <summary>In Action</summary>
 
-![](./readme_deploy.gif)
+![](./media/readme_deploy.gif)
 
 </details>
 
@@ -59,7 +59,7 @@ Type **include + CTRL+SPACE**
 <details>
   <summary>In Action</summary>
 
-![](./readme_usage.gif)
+![](./media/readme_usage.gif)
 
 </details>
 
@@ -70,6 +70,6 @@ Type **include + CTRL+SPACE**
 <details>
   <summary>In Action</summary>
 
-![](./readme_resize.gif)
+![](./media/readme_resize.gif)
 
 </details>
