@@ -62,3 +62,14 @@ Type **include + CTRL+SPACE**
 ![](./readme_usage.gif)
 
 </details>
+
+### Tips
+
+* Increase suggestion popup size in VSCode
+  
+<details>
+  <summary>In Action</summary>
+
+![](./readme_resize.gif)
+
+</details>
