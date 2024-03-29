@@ -6,7 +6,7 @@ import { LOG_COMPLETION } from './logs.mjs'
 const REGEX_README = /(?:(?:#{2,}\s)(?<title>(?:[^\n\[\(]+)))(?:[^#]*?)(?<body>(?:@start(?<type>[a-z]+))[^@]*?(?:@end[a-z]+))/g
 
 //const REGEX_DEFINE = /^\!(define|procedure)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
-const REGEX_CODE = /^\!(?:define|definelong|procedure)\s(?<body>(?<prefix>[^\(]+)\((?<params>(?:[^\)]+))\))/gm;
+const REGEX_CODE = /^\!(?:define|definelong|procedure)\s(?<body>(?<prefix>[^\(\s]+)(?:\((?<params>(?:[^\)]+))\))?)[^\n]*/gm;
 const REGEX_THEME = /(theme)\s?([a-z]+)?\s?([^_\$][^(\$\W]{3,})\(/mg
 
 /***

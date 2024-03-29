@@ -129,10 +129,12 @@ export function fromExamples(puml) {
  */
 export function fromCode(puml) {
     let title = puml.prefix
+    let parameters = ''
+    if (puml.params) parameters = '(' + puml.params.split(',').map((m, i) => `\$\{${i}:${m.trim()}\}`).join(',') + ')'
     return {
         "title": title,
         "prefix": puml.prefix,
-        "body": puml.prefix + '(' + puml.params.split(',').map((m, i) => `\$\{${i}:${m.trim()}\}`).join(',') + ')',
+        "body": puml.prefix + parameters,
         "description": puml.body
     }
 }
