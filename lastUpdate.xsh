@@ -15,3 +15,4 @@ with open('lastUpdate.txt', 'w') as file:
 git add lastUpdate.txt
 git commit -m "Force to build "
 git push origin main
+open https://github.com/malys/plantuml-helpers/commits/main/
