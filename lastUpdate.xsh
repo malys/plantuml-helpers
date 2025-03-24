@@ -1,3 +1,4 @@
+#!/bin/xonsh
 from datetime import datetime
 
 # Get the current date
