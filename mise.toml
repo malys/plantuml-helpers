@@ -1,0 +1,9 @@
+#[tasks.test]
+#run="echo 'to implement'"
+[tasks.build]
+run="npx zx index.mjs"
+#[tasks.deploy]
+#run="echo 'to implement'"
+
+[tasks.keepalive]
+run="xonsh lastUpdate.xsh"
