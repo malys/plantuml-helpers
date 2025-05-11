@@ -9,7 +9,7 @@ It's not perfect but it's  a real help.
 
 ### [vscode-complete-from-file](https://github.com/rioj7/vscode-complete-from-file)
 
-* VSCode: `ext install rioj7.complete-from-file`
+* VSCode: `code --install-extension rioj7.complete-from-file`
 * VSCodium
 ```xonsh
 extension="rioj7.complete-from-file"
@@ -37,7 +37,7 @@ rm @(file)
 
 ## Configuration
 
-* Configure `vscode-complete-from-file` entension to load files from *plantuml-helpers*
+* Configure `complete-from-file` extension to load files from *plantuml-helpers*
 ```json
 "complete-from-file.documents": {
      "gcp": {
@@ -49,15 +49,15 @@ rm @(file)
         }
       ],
       "files": [ //List of autocompletions
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-C4.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-themes.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-awslib14.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-gcp.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-tupadr3.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-material.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-logos.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-office.complete",
-        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-k8s.complete"
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-C4.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-themes.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-awslib14.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-gcp.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-tupadr3.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-material.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-logos.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-office.complete",
+        "${workspaceFolder}${pathSeparator}.vscode${pathSeparator}plantuml-helpers${pathSeparator}plantuml-plantuml-stdlib-k8s.complete"
       ]
     }
 }
